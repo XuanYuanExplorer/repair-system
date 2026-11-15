@@ -1,0 +1,223 @@
+/* ==========================================================================
+   响应式布局层（v2）
+   目标：内容铺满视口、尺寸随窗口连续扩缩（clamp / auto-fill），不做"窄栏居中"。
+   断点只用于改变结构（列数、栏数），不用于限制宽度。
+   ========================================================================== */
+
+:root {
+  /* 侧边距随视口连续增长：16px → 64px，大屏也不留大片空白 */
+  --pad-x: clamp(16px, 2.4vw, 64px);
+  --pad-y: clamp(10px, 1.1vw, 26px);
+  --gap: clamp(12px, 1.4vw, 28px);
+  /* 卡片最小宽度：决定不同屏幕下的列数 */
+  --card-min: clamp(280px, 26vw, 460px);
+}
+
+/* ---------- 容器：全宽 ---------- */
+.screen {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.body {
+  padding: var(--pad-y) var(--pad-x) clamp(24px, 2.6vw, 56px);
+}
+
+.body.has-tab {
+  padding-bottom: calc(var(--tabbar-h) + clamp(24px, 3vw, 56px));
+}
+
+/* ---------- 平板 ≥640：服务宫格 6 列 ---------- */
+@media (min-width: 640px) {
+  .svcgrid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .svc {
+    padding: clamp(18px, 1.6vw, 30px) 10px clamp(14px, 1.2vw, 24px);
+  }
+
+  .svc:nth-child(3n) {
+    border-right: 1px solid var(--hair);
+  }
+
+  .svc:nth-child(6n) {
+    border-right: none;
+  }
+
+  .svc:nth-child(n + 4) {
+    border-bottom: 1px solid var(--hair);
+  }
+
+  .svc:nth-child(n + 7) {
+    border-bottom: none;
+  }
+}
+
+/* ---------- 桌面 ≥1024：放大排版、放宽栅格 ---------- */
+@media (min-width: 1024px) {
+  .mini {
+    font-size: clamp(10px, 0.62vw, 12px);
+  }
+
+  .h-cn {
+    font-size: clamp(13px, 0.85vw, 17px);
+  }
+
+  .h-en {
+    font-size: clamp(9px, 0.58vw, 11px);
+  }
+
+  .sec {
+    margin: clamp(20px, 1.7vw, 34px) 0 clamp(12px, 1.1vw, 20px);
+    padding-top: 14px;
+  }
+
+  .sec .h-cn {
+    font-size: clamp(14px, 0.92vw, 18px);
+  }
+
+  .sec .all {
+    font-size: clamp(9px, 0.58vw, 11px);
+  }
+
+  .rowline {
+    padding: clamp(12px, 1vw, 18px) 0;
+    font-size: clamp(13px, 0.85vw, 16px);
+  }
+
+  .svc {
+    font-size: clamp(12px, 0.78vw, 15px);
+    gap: clamp(9px, 0.8vw, 14px);
+  }
+
+  .svc .en {
+    font-size: clamp(8px, 0.5vw, 10px);
+  }
+
+  .tabbar {
+    justify-content: center;
+    padding: clamp(12px, 0.9vw, 18px) 8px calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .tab {
+    flex: 0 1 clamp(160px, 14vw, 260px);
+    font-size: clamp(11px, 0.72vw, 14px);
+  }
+
+  .body .page > .title {
+    font-size: clamp(28px, 1.9vw + 8px, 46px);
+  }
+
+  .body .page .k-brand {
+    font-size: clamp(9px, 0.6vw, 11px);
+    letter-spacing: 0.36em;
+  }
+
+  /* 纯文本段落控制行长，避免超宽行 */
+  .prose,
+  .rich-text {
+    max-width: 82ch;
+  }
+}
+
+/* ==========================================================================
+   动态响应：页面切换 + 内容入场 + 悬停反馈
+   ========================================================================== */
+
+/* 路由切换：淡入上浮 */
+.page-enter-active {
+  transition: opacity 0.26s ease, transform 0.26s cubic-bezier(0.22, 0.8, 0.28, 1);
+}
+
+.page-leave-active {
+  transition: opacity 0.14s ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-leave-to {
+  opacity: 0;
+}
+
+/* 页面首屏元素错峰入场 */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(9px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .page > :nth-child(-n + 7) {
+    animation: rise-in 0.36s cubic-bezier(0.22, 0.8, 0.28, 1) both;
+  }
+
+  .page > :nth-child(1) { animation-delay: 0.02s; }
+  .page > :nth-child(2) { animation-delay: 0.06s; }
+  .page > :nth-child(3) { animation-delay: 0.1s; }
+  .page > :nth-child(4) { animation-delay: 0.13s; }
+  .page > :nth-child(5) { animation-delay: 0.16s; }
+  .page > :nth-child(6) { animation-delay: 0.19s; }
+  .page > :nth-child(7) { animation-delay: 0.22s; }
+}
+
+/* 悬停：仅精细指针设备，避免触屏粘连 */
+@media (hover: hover) and (pointer: fine) {
+  .card,
+  .bill,
+  .qcell,
+  .svc,
+  .notice-row,
+  .rowline {
+    transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+  }
+
+  .card:hover,
+  .bill:hover,
+  .qcell:hover,
+  .svc:hover {
+    background: #fbfbfa;
+  }
+
+  .notice-row:hover,
+  .rowline:hover {
+    background: #fafaf8;
+  }
+
+  .tab:hover {
+    color: var(--ink);
+  }
+
+  .btn:not(:disabled):hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* 宽屏：公约/清单编号列表两列，避免单列拉满 */
+@media (min-width: 1100px) {
+  .page > .rules ol,
+  .page ol.rules {
+    column-count: 2;
+    column-gap: clamp(32px, 3vw, 64px);
+  }
+
+  .page ol.rules li {
+    break-inside: avoid;
+    padding: clamp(10px, 0.9vw, 16px) 0;
+  }
+}
+
+/* 键盘焦点可见 */
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}

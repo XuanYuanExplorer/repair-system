@@ -1,0 +1,38 @@
+/* 设计令牌：唯一真源（颜色 / 字体 / 线宽 / 间距 / 字号） */
+:root {
+  --ink: #101010;
+  --red: #d93b3b;
+  --paper: #ffffff;
+  --panel: #f4f4f2;
+  --hair: #e2e2e0;
+  --mute: #9a9a98;
+  --ghost: #c4c4c2;
+  --dash: #c9c9c7;
+
+  --sans: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+  --serif: 'Playfair Display', 'Noto Serif SC', 'Songti SC', 'SimSun', Georgia, serif;
+
+  --line: 1.5px;
+  --line-thin: 1px;
+
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 22px;
+  --sp-6: 32px;
+
+  --screen-w: 375px;
+  /* 网页化布局：内容栏最大宽度（桌面居中，移动端全宽）与固定底栏高度 */
+  --page-max: 640px;
+  --tabbar-h: 62px;
+
+  --fs-kicker: 10px;
+  --fs-label: 9px;
+  --fs-xs: 11px;
+  --fs-sm: 13px;
+  --fs-md: 14px;
+  --fs-lg: 20px;
+  --fs-title: 26px;
+  --fs-num: 34px;
+}
